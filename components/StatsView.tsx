@@ -33,6 +33,18 @@ const formatFastingTime = (hours: number) => {
   return `${h}h ${m}m`;
 };
 
+// 습관 색상 유틸리티
+const getHabitColorClasses = (color: string) => {
+  switch (color) {
+    case 'rose': return 'bg-rose-50 text-rose-600 border-rose-100';
+    case 'amber': return 'bg-amber-50 text-amber-600 border-amber-100';
+    case 'teal': return 'bg-teal-50 text-teal-600 border-teal-100';
+    case 'indigo': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+    case 'cyan': return 'bg-cyan-50 text-cyan-600 border-cyan-100';
+    default: return 'bg-orange-50 text-orange-600 border-orange-100';
+  }
+};
+
 const HeatmapPopup = ({ title, logs, color, onClose }: { title: string, logs: Record<string, DailyLog>, color: string, onClose: () => void }) => {
   const dates = [];
   const today = new Date();
@@ -57,7 +69,7 @@ const HeatmapPopup = ({ title, logs, color, onClose }: { title: string, logs: Re
       <div className="bg-white w-full max-w-[340px] p-8 rounded-[40px] shadow-2xl border border-gray-100" onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-black text-gray-900">{title} 잔디</h3>
-          <button onClick={onClose} className="p-2 bg-gray-50 rounded-full"><X size={18} /></button>
+          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full"><X size={18} /></button>
         </div>
         <div className="grid grid-cols-11 gap-1.5 mb-6">
           {dates.map(date => {
@@ -362,7 +374,6 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
 
       {isEditing ? (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* 체중 수정 */}
           <div className="bg-purple-50 p-6 rounded-[32px] space-y-4">
             <div className="flex items-center gap-3"><Scale className="text-purple-500" size={20} /><span className="font-bold text-purple-900">체중 수정</span></div>
             <div className="flex items-center gap-3 bg-white p-4 rounded-2xl">
@@ -371,7 +382,6 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
             </div>
           </div>
 
-          {/* 식단 수정 - 레이아웃 개선 */}
           <div className="bg-green-50 p-6 rounded-[32px] space-y-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3"><Utensils className="text-green-500" size={20} /><span className="font-bold text-green-900">식단 리스트</span></div>
@@ -380,18 +390,17 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
             <div className="space-y-3">
               {(selectedLog.meals || []).map((m, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm">
-                  <select value={m.type} onChange={e => { const meals = [...(selectedLog.meals || [])]; meals[i].type = e.target.value; updateTempLog(selectedDate, { meals }); }} className="bg-green-50 text-[10px] font-black text-green-600 p-2 rounded-lg border-none focus:ring-0">
+                  <select value={m.type} onChange={e => { const meals = [...(selectedLog.meals || [])]; meals[i].type = e.target.value; updateTempLog(selectedDate, { meals }); }} className="shrink-0 bg-green-50 text-[10px] font-black text-green-600 p-2 rounded-lg border-none focus:ring-0">
                     {["아침", "점심", "저녁", "간식", "야식"].map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                   <input type="text" value={m.food} onChange={e => { const meals = [...(selectedLog.meals || [])]; meals[i].food = e.target.value; updateTempLog(selectedDate, { meals }); }} placeholder="음식명" className="flex-1 text-sm font-bold text-gray-700 focus:outline-none bg-transparent min-w-0" />
-                  <button onClick={() => { const meals = (selectedLog.meals || []).filter((_, idx) => idx !== i); updateTempLog(selectedDate, { meals }); }} className="p-2 text-red-400 bg-red-50 rounded-xl active:bg-red-100 shrink-0"><Trash2 size={16} /></button>
+                  <button onClick={() => { const meals = (selectedLog.meals || []).filter((_, idx) => idx !== i); updateTempLog(selectedDate, { meals }); }} className="shrink-0 p-2 text-red-400 bg-red-50 rounded-xl active:bg-red-100"><Trash2 size={16} /></button>
                 </div>
               ))}
               {(!selectedLog.meals || selectedLog.meals.length === 0) && <p className="text-center py-4 text-green-300 text-xs font-bold">등록된 식단이 없습니다.</p>}
             </div>
           </div>
 
-          {/* 운동 수정 */}
           <div className="bg-blue-50 p-6 rounded-[32px] space-y-4">
             <div className="flex items-center gap-3"><Dumbbell className="text-blue-500" size={20} /><span className="font-bold text-blue-900">운동 수정</span></div>
             <div className="grid grid-cols-3 gap-2">
@@ -408,7 +417,6 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
             </div>
           </div>
 
-          {/* 커스텀 습관 수정 모드 추가 */}
           <div className="bg-orange-50 p-6 rounded-[32px] space-y-4">
             <div className="flex items-center gap-3"><Star className="text-orange-500" size={20} /><span className="font-bold text-orange-900">습관 완료 여부</span></div>
             <div className="space-y-2">
@@ -448,17 +456,16 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
             ) : (
               <div className="grid grid-cols-1 gap-3">
                 {selectedLog.weight && (
-                  <div className="p-5 bg-white border border-gray-100 rounded-[28px] flex justify-between items-center shadow-sm ring-2 ring-purple-50">
+                  <div onClick={() => setEasterEgg({title: "체중", color: "bg-purple-500"})} className="p-5 bg-white border border-gray-100 rounded-[28px] flex justify-between items-center shadow-sm ring-2 ring-purple-50 active:scale-95 transition-all cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-purple-50 rounded-xl text-purple-500"><Scale size={18} /></div>
-                      <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
                         <span className="font-bold text-gray-700">체중</span>
-                        <div className="flex gap-2 mt-1">
-                          <button onClick={() => setEasterEgg({title: "체중", color: "bg-purple-500"})} className="text-[9px] font-black text-purple-400 bg-purple-50 px-2 py-0.5 rounded-md">잔디</button>
-                          {selectedLog.weightPhotos && selectedLog.weightPhotos.length > 0 && (
-                            <button onClick={() => { setViewingPhotos(selectedLog.weightPhotos!); setCurrentPhotoIdx(0); }} className="text-[9px] font-black text-purple-400 bg-purple-50 px-2 py-0.5 rounded-md flex items-center gap-1"><Camera size={10} /> {selectedLog.weightPhotos.length}</button>
-                          )}
-                        </div>
+                        {selectedLog.weightPhotos && selectedLog.weightPhotos.length > 0 && (
+                          <button onClick={(e) => { e.stopPropagation(); setViewingPhotos(selectedLog.weightPhotos!); setCurrentPhotoIdx(0); }} className="p-1.5 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors">
+                            <Camera size={14} />
+                          </button>
+                        )}
                       </div>
                     </div>
                     <span className="text-lg font-black text-purple-600">{selectedLog.weight}kg</span>
@@ -474,9 +481,9 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
                   <div onClick={() => setEasterEgg({title: "식사", color: "bg-emerald-500"})} className="p-5 bg-white border border-gray-100 rounded-[28px] space-y-3 shadow-sm ring-2 ring-emerald-50 active:scale-95 transition-all">
                     <div className="flex items-center gap-3"><div className="p-2 bg-green-50 rounded-xl text-green-500"><Utensils size={18} /></div><span className="font-bold text-gray-700">식단 리스트</span></div>
                     {selectedLog.meals.map((m, i) => (
-                      <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
-                        <span className="text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg">{m.type}</span>
-                        <span className="text-sm font-medium text-gray-600 truncate ml-2">{m.food}</span>
+                      <div key={i} className="flex items-center py-2 border-b border-gray-50 last:border-0">
+                        <span className="shrink-0 text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg min-w-[40px] text-center">{m.type}</span>
+                        <span className="flex-1 text-sm font-medium text-gray-600 truncate ml-3">{m.food}</span>
                       </div>
                     ))}
                   </div>
@@ -495,8 +502,9 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
                     <div className="flex flex-wrap gap-2">
                       {selectedLog.customHabits.filter(h => h.completed).map((h, i) => (
                         <span key={i} 
-                          onClick={(e) => { e.stopPropagation(); setEasterEgg({title: h.name, color: "bg-orange-400"}); }}
-                          className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-xl text-xs font-bold border border-orange-100 active:scale-90 transition-transform cursor-pointer">
+                          onClick={(e) => { e.stopPropagation(); setEasterEgg({title: h.name, color: getHabitColorClasses(h.color).split(' ')[1].replace('text-', 'bg-')}); }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-90 cursor-pointer ${getHabitColorClasses(h.color)}`}
+                        >
                           {h.name}
                         </span>
                       ))}

@@ -1,7 +1,7 @@
 import React from "react";
 import { LucideIcon } from "lucide-react";
 
-export type HabitColor = "blue" | "green" | "purple" | "gray" | "yellow" | "orange" | "pink" | "teal" | "indigo" | "amber";
+export type HabitColor = "blue" | "green" | "purple" | "gray" | "yellow" | "orange" | "rose" | "amber" | "teal" | "indigo" | "cyan";
 
 interface HabitCardProps {
   title: string;
@@ -29,10 +29,11 @@ const HabitCard: React.FC<HabitCardProps> = ({
     gray: "bg-gray-50 border-gray-200 text-gray-600",
     yellow: "bg-yellow-50 border-yellow-100 text-yellow-600",
     orange: "bg-orange-50 border-orange-100 text-orange-600",
-    pink: "bg-pink-50 border-pink-100 text-pink-600",
+    rose: "bg-rose-50 border-rose-100 text-rose-600",
+    amber: "bg-amber-50 border-amber-100 text-amber-600",
     teal: "bg-teal-50 border-teal-100 text-teal-600",
     indigo: "bg-indigo-50 border-indigo-100 text-indigo-600",
-    amber: "bg-amber-50 border-amber-100 text-amber-600",
+    cyan: "bg-cyan-50 border-cyan-100 text-cyan-600",
   };
 
   const activeColorMap: Record<HabitColor, string> = {
@@ -42,10 +43,11 @@ const HabitCard: React.FC<HabitCardProps> = ({
     gray: "bg-gray-500 text-white",
     yellow: "bg-yellow-500 text-white",
     orange: "bg-orange-500 text-white",
-    pink: "bg-pink-500 text-white",
+    rose: "bg-rose-500 text-white",
+    amber: "bg-amber-500 text-white",
     teal: "bg-teal-500 text-white",
     indigo: "bg-indigo-500 text-white",
-    amber: "bg-amber-500 text-white",
+    cyan: "bg-cyan-500 text-white",
   };
 
   return (

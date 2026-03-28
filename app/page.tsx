@@ -332,16 +332,22 @@ export default function Home() {
         </Modal>
       )}
 
-      {showModal === "custom-edit" && editingHabit && (
+            {showModal === "custom-edit" && editingHabit && (
         <Modal title="습관 편집" onClose={() => setShowModal(null)}>
           <div className="space-y-6">
             <input type="text" value={editingHabit.name} onChange={(e) => setEditingHabit({...editingHabit, name: e.target.value})} className="w-full text-2xl font-bold p-4 bg-gray-50 rounded-2xl focus:outline-none" />
             <div className="flex gap-3 justify-center">
-              {(["orange", "pink", "teal", "indigo", "amber"] as HabitColor[]).map(c => (
+              {(["rose", "amber", "teal", "indigo", "cyan"] as HabitColor[]).map(c => (
                 <button 
                   key={c} onClick={() => setEditingHabit({...editingHabit, color: c})}
                   className={`w-10 h-10 rounded-full border-4 ${editingHabit.color === c ? "border-black" : "border-transparent"}`}
-                  style={{ backgroundColor: c === 'orange' ? '#F97316' : c === 'pink' ? '#EC4899' : c === 'teal' ? '#14B8A6' : c === 'indigo' ? '#6366F1' : '#F59E0B' }}
+                  style={{ backgroundColor: 
+                    c === 'rose' ? '#F43F5E' : 
+                    c === 'amber' ? '#F59E0B' : 
+                    c === 'teal' ? '#14B8A6' : 
+                    c === 'indigo' ? '#6366F1' : 
+                    '#06B6D4' // cyan
+                  }}
                 />
               ))}
             </div>
