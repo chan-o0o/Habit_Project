@@ -128,18 +128,33 @@ export default function Home() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newPhotos = [...weightPhotos];
       Array.from(files).forEach(file => {
-        if (newPhotos.length < 5) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const max_size = 800;
+            if (width > height) {
+              if (width > max_size) { height *= max_size / width; width = max_size; }
+            } else {
+              if (height > max_size) { width *= max_size / height; height = max_size; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
             setWeightPhotos(prev => {
-              if (prev.length < 5) return [...prev, reader.result as string];
+              if (prev.length < 5) return [...prev, compressedDataUrl];
               return prev;
             });
           };
-          reader.readAsDataURL(file);
-        }
+          img.src = reader.result as string;
+        };
+        reader.readAsDataURL(file);
       });
     }
   };
@@ -242,9 +257,17 @@ export default function Home() {
       {showModal === "weight" && (
         <Modal title="체중 & 사진 기록" onClose={() => setShowModal(null)}>
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <input autoFocus type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="00.0" className="flex-1 text-5xl font-black text-center focus:outline-none bg-gray-50 p-6 rounded-[32px]" />
-              <span className="text-2xl font-bold text-gray-400">kg</span>
+            <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-[32px]">
+              <input 
+                autoFocus 
+                type="number" 
+                inputMode="decimal"
+                value={weight} 
+                onChange={(e) => setWeight(e.target.value)} 
+                placeholder="00.0" 
+                className="w-full text-4xl font-black text-center focus:outline-none bg-transparent" 
+              />
+              <span className="text-xl font-bold text-gray-400 mr-4">kg</span>
             </div>
             
             <div className="space-y-3">
@@ -254,20 +277,20 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {weightPhotos.map((p, i) => (
-                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden group">
+                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-sm">
                     <img src={p} alt="Preview" className="w-full h-full object-cover" />
                     <button onClick={() => deletePhoto(i)} className="absolute top-1 right-1 p-1 bg-black/50 text-white rounded-full"><X size={10} /></button>
                   </div>
                 ))}
                 {weightPhotos.length < 5 && (
-                  <button onClick={() => fileInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 hover:border-purple-300 hover:text-purple-300 transition-colors">
+                  <button onClick={() => fileInputRef.current?.click()} className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 active:bg-gray-50 transition-colors">
                     <Plus size={20} />
                   </button>
                 )}
               </div>
             </div>
 
-            <button onClick={() => setShowModal(null)} className="w-full py-4 bg-purple-600 text-white rounded-[24px] font-bold text-lg shadow-lg shadow-purple-200">저장하기</button>
+            <button onClick={() => setShowModal(null)} className="w-full py-4 bg-purple-600 text-white rounded-[24px] font-bold text-lg shadow-lg shadow-purple-200 active:scale-95 transition-transform">저장하기</button>
           </div>
         </Modal>
       )}
