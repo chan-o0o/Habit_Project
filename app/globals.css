@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: #f3f4f6; /* Gray-100 */
+}
+
+/* iOS Safari bounce scroll inhibition if needed */
+body {
+  touch-action: pan-y;
+  overscroll-behavior-y: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 10px;
+}
+
+/* Apartment Grid Card Hover / Press effect */
+.card-press:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease-in-out;
+}
+
+@keyframes modal-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-modal-up {
+  animation: modal-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
