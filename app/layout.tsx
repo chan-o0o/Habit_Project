@@ -5,13 +5,13 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Habit Apartment",
-  description: "Track your habits daily.",
+  title: "오늘의 습관",
+  description: "매일매일 기록하는 귀여운 습관 관리",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Habit Apartment",
+    title: "오늘의 습관",
   },
   formatDetection: {
     telephone: false,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -36,7 +36,7 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/iconimage.png" />
       </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900 overflow-x-hidden`}>
         <div className="mx-auto min-h-screen max-w-[390px] shadow-lg bg-white relative">
