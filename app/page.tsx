@@ -163,6 +163,11 @@ export default function Home() {
     setWeightPhotos(weightPhotos.filter((_, i) => i !== idx));
   };
 
+  const updateLogs = (newLogs: Record<string, any>) => {
+    setLogs(newLogs);
+    localStorage.setItem("habit_logs", JSON.stringify(newLogs));
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <header className="px-6 pt-12 pb-4 flex justify-between items-end bg-white">
@@ -251,7 +256,7 @@ export default function Home() {
               <Plus size={32} /><span className="text-sm font-bold mt-2">습관 추가</span>
             </button>
           </div>
-        ) : ( <StatsView externalLogs={logs} /> )}
+        ) : ( <StatsView externalLogs={logs} onUpdateLogs={updateLogs} /> )}
       </main>
 
       {showModal === "weight" && (
