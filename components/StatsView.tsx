@@ -234,8 +234,8 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
     const validWeights = data.filter(d => d.weight !== null).map(d => d.weight as number);
     const currentMin = validWeights.length ? Math.min(...validWeights) : 60;
     const currentMax = validWeights.length ? Math.max(...validWeights) : 100;
-    const minW = Number((currentMin - 1).toFixed(1));
-    const maxW = Number((currentMax + 1).toFixed(1));
+    const minW = Number((currentMin - 0.5).toFixed(1));
+    const maxW = Number((currentMax + 0.5).toFixed(1));
     const total = data.reduce((acc, curr) => acc + (type === "weight" ? (curr.weight || 0) : curr.fasting), 0);
     const avgVal = total / (type === "weight" ? (validWeights.length || 1) : 7);
 
@@ -274,6 +274,33 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
               </BarChart>
             )}
           </ResponsiveContainer>
+        </div>
+
+        <div className="space-y-4 mb-24">
+          <h3 className="text-lg font-black px-2">상세 기록</h3>
+          {data.slice().reverse().map((d, i) => (
+            <div key={i} className="p-5 bg-gray-50 rounded-[28px] flex justify-between items-center transition-all">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-gray-400 mb-0.5">{d.fullDate} ({d.name})</span>
+                <span className="text-lg font-black text-gray-800">
+                  {type === "weight" ? (d.weight ? `${d.weight}kg` : "기록 없음") : (d.fasting > 0 ? formatFastingTime(d.fasting) : "기록 없음")}
+                </span>
+              </div>
+              {type === "weight" && d.photos && d.photos.length > 0 && (
+                <button 
+                  onClick={() => { setViewingPhotos(d.photos); setCurrentPhotoIdx(0); }}
+                  className="p-3 bg-purple-100 text-purple-600 rounded-2xl active:scale-90 transition-transform shadow-sm"
+                >
+                  <Camera size={20} />
+                </button>
+              )}
+              {type === "fasting" && d.fasting > 0 && (
+                <div className="p-3 bg-green-100 text-green-600 rounded-2xl">
+                  <Clock size={20} />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     );

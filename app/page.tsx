@@ -166,9 +166,20 @@ export default function Home() {
       setSelectedMealType(null);
       if (fasting && fastingStartTime) { 
         const duration = (Date.now() - fastingStartTime) / (1000 * 60 * 60);
-        setFastingHours(duration);
+        const startDateStr = getLocalDateString(new Date(fastingStartTime));
+        
+        // 단식 시작 날짜의 로그를 찾아 업데이트
+        const savedLogs = localStorage.getItem("habit_logs");
+        const currentLogs = savedLogs ? JSON.parse(savedLogs) : {};
+        if (!currentLogs[startDateStr]) currentLogs[startDateStr] = {};
+        currentLogs[startDateStr].fastingHours = duration;
+        localStorage.setItem("habit_logs", JSON.stringify(currentLogs));
+        setLogs(currentLogs);
+
+        // 현재 상태 초기화
         setFasting(false); 
-        setFastingStartTime(null); 
+        setFastingStartTime(null);
+        setFastingHours(0);
       }
     }
   };
