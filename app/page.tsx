@@ -31,8 +31,10 @@ interface MealRecord {
 }
 
 const getLocalDateString = (date: Date) => {
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const Modal = ({ title, onClose, children }: { title: string, onClose: () => void, children: React.ReactNode }) => (
@@ -69,29 +71,74 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const today = getLocalDateString(new Date());
     const saved = localStorage.getItem("habit_data");
+    const savedLogs = localStorage.getItem("habit_logs");
+    const parsedLogs = savedLogs ? JSON.parse(savedLogs) : {};
+    setLogs(parsedLogs);
+
     if (saved) {
       const parsed = JSON.parse(saved);
-      setFasting(parsed.fasting || false);
-      setFastingStartTime(parsed.fastingStartTime || null);
-      setFastingHours(parsed.fastingHours || 0);
-      setWeight(parsed.weight || "");
-      setWeightPhotos(parsed.weightPhotos || (parsed.weightPhoto ? [parsed.weightPhoto] : []));
-      setMeals(parsed.meals || []);
-      setExercises(parsed.exercises || []);
-      setCustomHabits(parsed.customHabits || []);
+      const lastDate = parsed.lastDate || today;
+
+      if (lastDate !== today) {
+        // 날짜가 바뀜: 일일 기록 리셋, 단식 진행 상태는 유지
+        setFasting(parsed.fasting || false);
+        setFastingStartTime(parsed.fastingStartTime || null);
+        setFastingHours(0);
+        setWeight("");
+        setWeightPhotos([]);
+        setMeals([]);
+        setExercises([]);
+        setCustomHabits((parsed.customHabits || []).map((h: CustomHabit) => ({ ...h, completed: false })));
+      } else {
+        setFasting(parsed.fasting || false);
+        setFastingStartTime(parsed.fastingStartTime || null);
+        setFastingHours(parsed.fastingHours || 0);
+        setWeight(parsed.weight || "");
+        setWeightPhotos(parsed.weightPhotos || (parsed.weightPhoto ? [parsed.weightPhoto] : []));
+        setMeals(parsed.meals || []);
+        setExercises(parsed.exercises || []);
+        setCustomHabits(parsed.customHabits || []);
+      }
     }
-    const savedLogs = localStorage.getItem("habit_logs");
-    if (savedLogs) setLogs(JSON.parse(savedLogs));
+
+    // PWA 백그라운드에서 돌아올 때 날짜 체크를 위한 이벤트 리스너
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const nowToday = getLocalDateString(new Date());
+        const currentData = localStorage.getItem("habit_data");
+        if (currentData) {
+          const parsed = JSON.parse(currentData);
+          if (parsed.lastDate && parsed.lastDate !== nowToday) {
+            window.location.reload(); // 날짜 변경 시 앱 새로고침하여 상태 초기화
+          }
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   useEffect(() => {
-    const data = { fasting, fastingStartTime, fastingHours, weight, weightPhotos, meals, exercises, customHabits };
+    const today = getLocalDateString(new Date());
+    const data = { 
+      fasting, 
+      fastingStartTime, 
+      fastingHours, 
+      weight, 
+      weightPhotos, 
+      meals, 
+      exercises, 
+      customHabits,
+      lastDate: today
+    };
     localStorage.setItem("habit_data", JSON.stringify(data));
     
-    const today = getLocalDateString(new Date());
     const savedLogs = localStorage.getItem("habit_logs");
     const currentLogs = savedLogs ? JSON.parse(savedLogs) : {};
+    
+    // 현재 상태를 오늘 날짜 로그에 저장
     currentLogs[today] = { 
       weight: weight ? parseFloat(weight) : null, 
       weightPhotos, 
@@ -100,6 +147,7 @@ export default function Home() {
       exercises,
       customHabits 
     };
+    
     localStorage.setItem("habit_logs", JSON.stringify(currentLogs));
     setLogs(currentLogs);
   }, [fasting, fastingStartTime, fastingHours, weight, weightPhotos, meals, exercises, customHabits]);
