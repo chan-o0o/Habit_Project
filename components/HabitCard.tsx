@@ -53,7 +53,15 @@ const HabitCard: React.FC<HabitCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`card-press relative flex flex-col p-4 rounded-3xl border transition-all h-[180px] w-full overflow-hidden ${
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      className={`card-press relative flex flex-col p-4 rounded-3xl border transition-all h-[180px] w-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 ${
         isCompleted ? activeColorMap[color] : colorMap[color]
       } ${className}`}
     >

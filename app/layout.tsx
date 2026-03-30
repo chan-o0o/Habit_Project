@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "오늘의 습관",
   },
+  icons: {
+    apple: "/iconimage.png",
+  },
   formatDetection: {
     telephone: false,
   },
@@ -33,11 +36,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="apple-touch-icon" href="/iconimage.png" />
-      </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900 overflow-x-hidden`}>
         <div className="mx-auto min-h-screen max-w-[390px] shadow-lg bg-white relative">
           {children}
