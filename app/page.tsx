@@ -161,25 +161,18 @@ export default function Home() {
 
   const confirmMeal = () => {
     if (selectedMealType && foodInput) {
-      setMeals([...meals, { type: selectedMealType, food: foodInput }]);
+      const newMeals = [...meals, { type: selectedMealType, food: foodInput }];
+      setMeals(newMeals);
       setFoodInput("");
       setSelectedMealType(null);
+      
       if (fasting && fastingStartTime) { 
         const duration = (Date.now() - fastingStartTime) / (1000 * 60 * 60);
-        const startDateStr = getLocalDateString(new Date(fastingStartTime));
         
-        // 단식 시작 날짜의 로그를 찾아 업데이트
-        const savedLogs = localStorage.getItem("habit_logs");
-        const currentLogs = savedLogs ? JSON.parse(savedLogs) : {};
-        if (!currentLogs[startDateStr]) currentLogs[startDateStr] = {};
-        currentLogs[startDateStr].fastingHours = duration;
-        localStorage.setItem("habit_logs", JSON.stringify(currentLogs));
-        setLogs(currentLogs);
-
-        // 현재 상태 초기화
+        // 현재 상태 업데이트 (이것이 useEffect를 통해 localStorage에 저장됨)
+        setFastingHours(duration);
         setFasting(false); 
         setFastingStartTime(null);
-        setFastingHours(0);
       }
     }
   };
@@ -225,6 +218,18 @@ export default function Home() {
   const updateLogs = (newLogs: Record<string, any>) => {
     setLogs(newLogs);
     localStorage.setItem("habit_logs", JSON.stringify(newLogs));
+
+    // 통계 페이지에서 오늘 날짜의 기록을 수정했을 경우, 현재 상태(states)들도 동기화해줘야 함
+    const today = getLocalDateString(new Date());
+    if (newLogs[today]) {
+      const todayLog = newLogs[today];
+      if (todayLog.meals) setMeals(todayLog.meals);
+      if (todayLog.weight !== undefined) setWeight(todayLog.weight === null ? "" : todayLog.weight.toString());
+      if (todayLog.weightPhotos) setWeightPhotos(todayLog.weightPhotos);
+      if (todayLog.fastingHours !== undefined) setFastingHours(todayLog.fastingHours);
+      if (todayLog.exercises) setExercises(todayLog.exercises);
+      if (todayLog.customHabits) setCustomHabits(todayLog.customHabits);
+    }
   };
 
   return (
@@ -272,7 +277,10 @@ export default function Home() {
             <HabitCard title="식사 & 단식" icon={Utensils} color="green" onClick={() => setShowModal("meal")}>
               <div className="flex flex-col h-full">
                 <div className="flex-1 flex flex-col justify-center gap-1">
-                  {meals.length > 0 ? meals.slice(-2).map((m, i) => (
+                  {meals.length > 0 ? [...meals].sort((a, b) => {
+                    const order = ["아침", "점심", "저녁", "간식", "야식"];
+                    return order.indexOf(a.type) - order.indexOf(b.type);
+                  }).slice(-2).map((m, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className="text-[9px] font-black text-green-700 bg-green-100 px-1.5 py-0.5 rounded-md min-w-[32px] text-center">{m.type}</span>
                       <span className="text-[10px] font-medium text-green-900 truncate">{m.food}</span>

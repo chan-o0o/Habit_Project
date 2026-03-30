@@ -509,7 +509,10 @@ const StatsView = ({ externalLogs, onUpdateLogs }: { externalLogs?: Record<strin
                 {selectedLog.meals && selectedLog.meals.length > 0 && (
                   <div onClick={() => setEasterEgg({title: "식사", color: "bg-emerald-500"})} className="p-5 bg-white border border-gray-100 rounded-[28px] space-y-3 shadow-sm ring-2 ring-emerald-50 active:scale-95 transition-all">
                     <div className="flex items-center gap-3"><div className="p-2 bg-green-50 rounded-xl text-green-500"><Utensils size={18} /></div><span className="font-bold text-gray-700">식단 리스트</span></div>
-                    {selectedLog.meals.map((m, i) => (
+                    {[...selectedLog.meals].sort((a, b) => {
+                      const order = ["아침", "점심", "저녁", "간식", "야식"];
+                      return order.indexOf(a.type) - order.indexOf(b.type);
+                    }).map((m, i) => (
                       <div key={i} className="flex items-center py-2 border-b border-gray-50 last:border-0">
                         <span className="shrink-0 text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg min-w-[40px] text-center">{m.type}</span>
                         <span className="flex-1 text-sm font-medium text-gray-600 truncate ml-3">{m.food}</span>
