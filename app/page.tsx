@@ -168,9 +168,23 @@ export default function Home() {
       
       if (fasting && fastingStartTime) { 
         const duration = (Date.now() - fastingStartTime) / (1000 * 60 * 60);
+        const startDateStr = getLocalDateString(new Date(fastingStartTime));
+        const todayStr = getLocalDateString(new Date());
+
+        if (startDateStr === todayStr) {
+          // 시작일과 종료일이 같으면 현재 상태 업데이트 (useEffect가 처리)
+          setFastingHours(duration);
+        } else {
+          // 시작일과 종료일이 다르면 시작일의 로그를 직접 업데이트
+          const savedLogs = localStorage.getItem("habit_logs");
+          const currentLogs = savedLogs ? JSON.parse(savedLogs) : {};
+          if (!currentLogs[startDateStr]) currentLogs[startDateStr] = {};
+          currentLogs[startDateStr].fastingHours = duration;
+          localStorage.setItem("habit_logs", JSON.stringify(currentLogs));
+          setLogs(currentLogs);
+          setFastingHours(0); // 오늘 날짜에는 단식 시간을 0으로 설정
+        }
         
-        // 현재 상태 업데이트 (이것이 useEffect를 통해 localStorage에 저장됨)
-        setFastingHours(duration);
         setFasting(false); 
         setFastingStartTime(null);
       }
